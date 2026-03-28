@@ -1,0 +1,68 @@
+Requirements:	
+
+	Ras Pi w/ GPS puck and Alpha Card, battery pack 
+    	Download latest image of Ubuntu 20.04.1
+    		#sudo apt-get update
+    		#sudo apt-get upgrade
+    		#sudo apt-get install kismet
+     		#sudo apt-get install gpsd gpsd-clients
+     		#sudo apt install git
+     		#sudo apt install dkms
+    
+    	Install drivers for alfa network card (Ubuntu and Ras PI):
+    		#git clone https://github.com/gnab/rtl8812au.git
+    		#dkms add ./rtl8812au
+    		#dkms build 8812au/4.2.2
+    		#dkms install 8812au/4.2.2
+    		#modprobe 8812au
+    		#iwconfig
+    	Kali
+    		#apt-get dist-upgrade
+    		#reboot
+    		#apt-get install realtek-rtl88xxau-dkms
+    		#reboot    	
+    		
+1. Check GPS functioning properly   ( See War-pi-34435, para 2.4 )
+	#lsusb
+	#dmesg | grep tty	(*Somewhere in the returned info "ttyUSB0" or similiar should be printed.  This is the location of the GPS device and should be noted.)
+	#gpsd -n -N -D4 /dev/ttyUSB0
+	#cgps -s 		(*Confirms GPS is receiving a signal.)
+	- ctrl + C to quit
+*If you receive an error that gpsd is already in use.  Run "systemctl status gpsd" and stop all services with gpsd "systemctl stop gpsd.service" and "systemctl disable gpsd"
+*If you continue to receive an error, edit the "/etc/default/gpsd" with the following
+	START_DAEMON="true"
+	GPSD_OPTIONS="-n"
+	DEVICES="/dev/ttyUSB0"
+	USBAUTO="false"
+	GPSD_SOCKET="/var/run/gpsd.sock"
+
+2. Run kismet
+	#sudo kismet  	(*While kismet is running, open web browser and go to http://localhost:2501)
+	*Ensure to select the proper interface (Ex. wlo1 or wlan1)
+	*You can also edit /etc/kismet/kismet.conf and add the proper interface as the default
+
+3. Convert file from .netxml to .kml
+	#wget http://files.salecker.org/netxml2kml/netxml2kml.py.txt
+	#mv netxml2kml.py.txt netxml2kml.py
+	#python netxml2kml.py --kmz --kml -o NEW-FILE ORIGINAL_KISMET_FILE.netxml
+	*Make sure to run with python2.7
+
+4. Download Google Earth pro
+	#mkdir google-earth && cd google-earth
+	#wget https://dl.google.com/dl/earth/client/current/google-earth-stable_current_amd64.deb
+	#sudo dpkg -i google-earth-stable*.deb
+
+5. Open Google Earth pro and then "import" the *.kml file
+
+
+
+If using Kali, use below notes.
+
+* Kismet files will be stored in current directory and saved in a .kismet file.  Use either of the below commands convert to either a .csv or .kml file.  The .csv gives additional information such as security being used.  The .kml is an XML-based markup language for use with Google Earth.
+
+	#kismetdb_to_kml --in some-kismet-log-file.kismet --out some-kml-file.kml
+	or
+	#kismetdb_to_wiglecsv --in some-kismet-log-file.kismet --out some-wigle-file.csv
+	
+* When converting to a .csv, remove the top header to import into Google Maps.  If not, it will have formatting errors because of the columns not aligning.                                                 
+

